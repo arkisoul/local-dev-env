@@ -1,0 +1,36 @@
+FROM alpine:edge
+
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories && \
+    apk update && apk upgrade && \
+    # apk --no-cache add dnsmasq && \s
+    apk add supervisor nginx && \
+    rm -rf /var/cache/apk/*
+
+VOLUME ["/var/www/html", "/etc/dnsmasq"]
+
+WORKDIR /var/www/html
+
+# Configure nginx
+RUN rm /etc/nginx/nginx.conf
+RUN mkdir -p /etc/nginx/logs
+RUN mkdir -p /etc/nginx/sites-available
+RUN mkdir -p /etc/nginx/sites-enabled
+RUN mkdir -p /etc/nginx/conf.d
+COPY config/nginx.conf /etc/nginx/nginx.conf
+COPY config/sites-available /etc/nginx/sites-available
+RUN ln -sfv /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default.conf
+RUN ln -sfv /etc/nginx/sites-available/arana.conf /etc/nginx/sites-enabled/arana.conf
+RUN ln -sfv /etc/nginx/sites-available/gearmanui.conf /etc/nginx/sites-enabled/gearmanui.conf
+
+# Configure dnsmasq
+# RUN mkdir -pv /etc/resolver
+# COPY config/resolver /etc/resolver
+# COPY config/dnsmasq.conf /etc/dnsmasq.conf
+
+# Configure supervisord
+COPY config/supervisord.server.conf /etc/supervisor/conf.d/supervisord.conf
+
+# EXPOSE 80 443 53/tcp 53/udp
+EXPOSE 80 443
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

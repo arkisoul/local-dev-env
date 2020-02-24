@@ -1,0 +1,29 @@
+FROM alpine:edge
+
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories && \
+    apk update && apk upgrade && \
+    apk add supervisor memcached && \
+    apk add php7-calendar php7-cli php7-ctype php7-curl php7-dom php7-fpm php7-gd php7-gearman php7-iconv php7-json php7-mbstring php7-memcached php7-mysqli php7-opcache php7-openssl php7-pear php7-phar php7-phalcon php7-pdo php7-pdo_mysql php7-simplexml php7-tokenizer php7-xml php7-xmlrpc php7-xmlreader php7-xmlwriter php7-zip && \
+    apk add composer && \
+    rm -rf /var/cache/apk/*
+
+VOLUME /var/www/html
+
+WORKDIR /var/www/html
+
+# Configure PHP-FPM
+COPY config/fpm-pool.conf /etc/php7/php-fpm.d/zzz_custom.conf
+COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
+
+# Configure supervisord
+COPY config/supervisord.app.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Add user for laravel application
+RUN addgroup -S www && adduser -S www -G www
+
+# Copy existing application directory permissions
+RUN chown -R www:www /var/www/html && chmod -R 777 /var/www/html
+
+EXPOSE 9000
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
