@@ -1,0 +1,17 @@
+FROM alpine:edge
+
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories && \
+    apk update && apk upgrade && \
+    apk add supervisor gearmand && \
+    rm -rf /var/cache/apk/*
+
+VOLUME /var/www/html
+
+WORKDIR /var/www/html
+
+# Configure supervisord
+COPY config/supervisord.gearman.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 4730
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

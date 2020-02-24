@@ -1,0 +1,63 @@
+version: '3.7'
+
+networks: 
+    app_network:
+        external: false
+        driver: bridge
+        
+services:
+    app_web:
+        build:
+            context: .
+            dockerfile: ./php/DockerFile
+        container_name: app_web
+        volumes:
+            - "./app:/var/www/html"
+        restart: on-failure
+        networks:
+            - app_network
+    app_server:
+        build:
+            context: .
+            dockerfile: ./server/DockerFile
+        container_name: app_server
+        volumes:
+            - "./app:/var/www/html"
+        ports:
+            # - "53:53/tcp"
+            # - "53:53/udp"
+            - "80:80"
+            - "443:443"
+            - "8083:8083"
+        restart: on-failure
+        dns:
+            - 127.0.0.1
+            - 1.1.1.1
+        cap_add:
+            - NET_ADMIN
+        networks:
+            - app_network
+    app_gearman:
+        build:
+            context: .
+            dockerfile: ./gearman/DockerFile
+        container_name: app_gearman
+        volumes:
+            - "./app:/var/www/html"
+        ports:
+            - "4730:4730"
+        restart: on-failure
+        networks:
+            - app_network
+    app_mysqldb:
+        image: yobasystems/alpine-mariadb
+        container_name: app_rdbms
+        environment:
+            - MYSQL_DATABASE=appdev
+            - MYSQL_ROOT_PASSWORD=r
+            - MYSQL_USER=appdev
+            - MYSQL_PASSWORD=appdev
+        ports:
+            - "3306:3306"
+        networks:
+            - app_network
