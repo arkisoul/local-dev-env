@@ -61,3 +61,24 @@ services:
             - "3306:3306"
         networks:
             - app_network
+    app_pgsql:
+        image: postgres:alpine
+        container_name: app_pgsql
+        environment:
+            - POSTGRES_DB=appdev
+            - POSTGRES_USER=appdev
+            - POSTGRES_PASSWORD=appdev
+        ports:
+            - "5432:5432"
+        networks:
+            - app_network
+    app_nosql:
+        image: mongo:bionic
+        container_name: app_mongodb
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=appdev
+            - MONGO_INITDB_ROOT_PASSWORD=appdev
+        ports:
+            - "27017:27017"
+        networks:
+            - app_network
