@@ -13,7 +13,6 @@ services:
         container_name: app_web
         volumes:
             - "./app:/var/www/html"
-        restart: on-failure
         networks:
             - app_network
     app_server:
@@ -37,18 +36,20 @@ services:
             - NET_ADMIN
         networks:
             - app_network
-    app_gearman:
-        build:
-            context: .
-            dockerfile: ./gearman/DockerFile
-        container_name: app_gearman
-        volumes:
-            - "./app:/var/www/html"
-        ports:
-            - "4730:4730"
-        restart: on-failure
-        networks:
-            - app_network
+        depends_on: 
+            - app_web
+    # app_gearman:
+    #     build:
+    #         context: .
+    #         dockerfile: ./gearman/DockerFile
+    #     container_name: app_gearman
+    #     volumes:
+    #         - "./app:/var/www/html"
+    #     ports:
+    #         - "4730:4730"
+    #     restart: on-failure
+    #     networks:
+    #         - app_network
     app_mysqldb:
         image: yobasystems/alpine-mariadb
         container_name: app_rdbms
@@ -61,24 +62,24 @@ services:
             - "3306:3306"
         networks:
             - app_network
-    app_pgsql:
-        image: postgres:alpine
-        container_name: app_pgsql
-        environment:
-            - POSTGRES_DB=appdev
-            - POSTGRES_USER=appdev
-            - POSTGRES_PASSWORD=appdev
-        ports:
-            - "5432:5432"
-        networks:
-            - app_network
-    app_nosql:
-        image: mongo:bionic
-        container_name: app_mongodb
-        environment:
-            - MONGO_INITDB_ROOT_USERNAME=appdev
-            - MONGO_INITDB_ROOT_PASSWORD=appdev
-        ports:
-            - "27017:27017"
-        networks:
-            - app_network
+    # app_pgsql:
+    #     image: postgres:alpine
+    #     container_name: app_pgsql
+    #     environment:
+    #         - POSTGRES_DB=appdev
+    #         - POSTGRES_USER=appdev
+    #         - POSTGRES_PASSWORD=appdev
+    #     ports:
+    #         - "5432:5432"
+    #     networks:
+    #         - app_network
+    # app_nosql:
+    #     image: mongo:bionic
+    #     container_name: app_mongodb
+    #     environment:
+    #         - MONGO_INITDB_ROOT_USERNAME=appdev
+    #         - MONGO_INITDB_ROOT_PASSWORD=appdev
+    #     ports:
+    #         - "27017:27017"
+    #     networks:
+    #         - app_network

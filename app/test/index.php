@@ -6,6 +6,6 @@
     <title>PHP: Server is running</title>
 </head>
 <body>
-    <?php phpinfo(); ?>
+    <?php phpinfo() ?>
 </body>
 </html>

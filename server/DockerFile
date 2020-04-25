@@ -17,6 +17,7 @@ RUN mkdir -p /etc/nginx/sites-available
 RUN mkdir -p /etc/nginx/sites-enabled
 RUN mkdir -p /etc/nginx/conf.d
 COPY config/nginx.conf /etc/nginx/nginx.conf
+COPY config/conf.d /etc/nginx/conf.d
 COPY config/sites-available /etc/nginx/sites-available
 RUN ln -sfv /etc/nginx/sites-available/default.conf /etc/nginx/sites-enabled/default.conf
 RUN ln -sfv /etc/nginx/sites-available/laravel.conf /etc/nginx/sites-enabled/laravel.conf
