@@ -19,10 +19,11 @@ COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
 COPY config/supervisord.app.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Add user for laravel application
-RUN addgroup -S www && adduser -S www -G www
+RUN addgroup -S www-data && adduser -S arch -G www-data
 
 # Copy existing application directory permissions
-RUN chown -R www:www /var/www/html && chmod -R 777 /var/www/html
+COPY --chown=arch:www-data app/ /var/www/html
+RUN chmod -R 0755 /var/www/html
 
 EXPOSE 9000
 
